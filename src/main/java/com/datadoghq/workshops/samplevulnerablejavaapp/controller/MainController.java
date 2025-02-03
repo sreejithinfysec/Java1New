@@ -59,13 +59,30 @@ public ResponseEntity<String> testDomain(@RequestBody DomainTestRequest request)
 public ResponseEntity<String> viewFile(@RequestBody ViewFileRequest request) {
     log.info("Reading file " + request.path);
     try {
-        String result = fileService.readFile(FilenameUtils.normalize(request.path));
+        // Validate the path to prevent directory traversal attacks
+        if (!isValidPath(request.path)) {
+            throw new IllegalArgumentException("Invalid path");
+        }
+        String result = fileService.readFile(request.path);
         return new ResponseEntity<>(result, HttpStatus.OK);
     } catch (FileForbiddenFileException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
     } catch (FileReadException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    } catch (IllegalArgumentException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
+}
+
+private boolean isValidPath(String path) {
+    // Check if the path contains ".." or "~"
+    if (path.contains("..") || path.contains("~")) {
+        return false;
+    }
+    // Add more validation rules if necessary
+    return true;
+}
+
 }
 
   }
