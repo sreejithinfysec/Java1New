@@ -55,17 +55,19 @@ public ResponseEntity<String> testDomain(@RequestBody DomainTestRequest request)
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @RequestMapping(method=RequestMethod.POST, value="/view-file", consumes="application/json")
-  public ResponseEntity<String> viewFile(@RequestBody ViewFileRequest request) {
+@RequestMapping(method=RequestMethod.POST, value="/view-file", consumes="application/json")
+public ResponseEntity<String> viewFile(@RequestBody ViewFileRequest request) {
     log.info("Reading file " + request.path);
     try {
-      String result = fileService.readFile(request.path);
-      return new ResponseEntity<>(result, HttpStatus.OK);
+        String result = fileService.readFile(FilenameUtils.normalize(request.path));
+        return new ResponseEntity<>(result, HttpStatus.OK);
     } catch (FileForbiddenFileException e) {
-      return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
     } catch (FileReadException e) {
-      return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
+}
+
   }
 
 }
