@@ -33,9 +33,10 @@ public class MainController {
 
 @RequestMapping(method=RequestMethod.POST, value="/test-domain", consumes="application/json")
 public ResponseEntity<String> testDomain(@RequestBody DomainTestRequest request) {
-    log.info("Testing domain " + request.getDomainName()); //Changed from direct access to getter method
+    Logger log = Logger.getLogger(MainController.class.getName());
+    log.info("Testing domain " + request.domainName);
     try {
-        String result = domainTestService.testDomain(request.getDomainName()); //Changed from direct access to getter method
+        String result = domainTestService.testDomain(request.domainName);
         return new ResponseEntity<>(result, HttpStatus.OK);
     } catch(InvalidDomainException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -44,6 +45,8 @@ public ResponseEntity<String> testDomain(@RequestBody DomainTestRequest request)
     } catch(Exception e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+}
+
 }
 
   }
